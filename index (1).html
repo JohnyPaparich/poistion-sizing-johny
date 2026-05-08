@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Position Sizing</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2330;
+    --border2: #252c3d;
+    --accent: #00e5a0;
+    --accent2: #0090ff;
+    --accent-dim: rgba(0,229,160,0.12);
+    --accent2-dim: rgba(0,144,255,0.12);
+    --red: #ff4560;
+    --red-dim: rgba(255,69,96,0.12);
+    --text: #e2e8f0;
+    --text2: #8892a4;
+    --text3: #4a5568;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Rajdhani', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 16px 64px;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .header-tag::before, .header-tag::after {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+  .header h1 {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .header h1 span { color: var(--accent); }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(0,229,160,0.04), 0 24px 64px rgba(0,0,0,0.6);
+  }
+
+  /* Mode toggle */
+  .mode-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border2);
+  }
+  .mode-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 14px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .mode-btn:first-child { border-right: 1px solid var(--border2); }
+  .mode-btn.active {
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .mode-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+  }
+  .mode-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* Fields */
+  .fields {
+    padding: 24px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text2);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .field-label .icon { font-size: 13px; }
+
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 11px 48px 11px 14px;
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .input-wrap input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  .input-wrap input::placeholder { color: var(--text3); }
+  .input-unit {
+    position: absolute;
+    right: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    pointer-events: none;
+  }
+
+  /* Subtitle hint */
+  .field-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    padding-left: 2px;
+  }
+
+  /* SL Section */
+  .sl-section {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .sl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border2);
+  }
+  .sl-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text2);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .add-btn {
+    background: var(--accent-dim);
+    border: 1px solid rgba(0,229,160,0.2);
+    border-radius: 6px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .add-btn:hover { background: rgba(0,229,160,0.2); }
+
+  .sl-rows { display: flex; flex-direction: column; }
+  .sl-row {
+    display: grid;
+    grid-template-columns: 32px 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    animation: slideIn 0.2s ease;
+  }
+  .sl-row:last-child { border-bottom: none; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .sl-row-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-align: center;
+  }
+  .sl-row input {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 7px 36px 7px 10px;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .sl-row input:focus { border-color: var(--accent); }
+  .sl-row-unit {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    margin-left: -32px;
+    pointer-events: none;
+    width: 28px;
+    text-align: right;
+  }
+  .sl-row-del {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: all 0.15s;
+  }
+  .sl-row-del:hover { color: var(--red); background: var(--red-dim); }
+
+  /* Results */
+  .results {
+    margin-top: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .results-header {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text2);
+    text-transform: uppercase;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .results-header::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    flex-shrink: 0;
+  }
+
+  .result-rows { display: flex; flex-direction: column; }
+  .result-row {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row:hover { background: rgba(255,255,255,0.02); }
+  .result-row-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-align: center;
+  }
+  .result-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .result-value {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .result-value.blue { color: var(--accent2); }
+  .result-formula {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    line-height: 1.4;
+  }
+  .result-sl-badge {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text2);
+    white-space: nowrap;
+  }
+
+  /* Summary bar */
+  .summary {
+    margin: 0 20px 20px;
+    background: linear-gradient(135deg, rgba(0,229,160,0.06), rgba(0,144,255,0.04));
+    border: 1px solid rgba(0,229,160,0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 80px;
+  }
+  .summary-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+  .summary-val {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .summary-val.green { color: var(--accent); }
+
+  .no-result {
+    padding: 24px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+  }
+
+  /* Number input spinners hide */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div class="header-tag">⚡ RISK CALCULATOR</div>
+    <h1>Position <span>Sizing</span></h1>
+  </div>
+
+  <div class="card">
+    <!-- Mode Toggle -->
+    <div class="mode-bar">
+      <button class="mode-btn active" id="modeA" onclick="setMode('A')">
+        <span class="mode-dot"></span>
+        Risk Amount → Lot
+      </button>
+      <button class="mode-btn" id="modeB" onclick="setMode('B')">
+        <span class="mode-dot"></span>
+        Lot → Risk Amount
+      </button>
+    </div>
+
+    <!-- Inputs -->
+    <div class="fields">
+
+      <!-- Capital -->
+      <div class="field-group">
+        <div class="field-label"><span class="icon">💰</span> เงินทุน / Capital</div>
+        <div class="input-wrap">
+          <input type="number" id="capital" placeholder="10000" min="0" step="any" oninput="calc()" />
+          <span class="input-unit">฿ / $</span>
+        </div>
+        <div class="field-hint">USD / THB / ฿ (หน่วยใดก็ได้)</div>
+      </div>
+
+      <!-- Risk % -->
+      <div class="field-group">
+        <div class="field-label"><span class="icon">🎯</span> Risk % ต่อเทรด</div>
+        <div class="input-wrap">
+          <input type="number" id="riskPct" placeholder="1" min="0" max="100" step="any" oninput="calc()" />
+          <span class="input-unit">%</span>
+        </div>
+        <div class="field-hint">เช่น 1 = เสียไม่เกิน 1% ต่อ position</div>
+      </div>
+
+      <!-- Lot (mode B only) -->
+      <div class="field-group" id="lotGroup" style="display:none;">
+        <div class="field-label"><span class="icon">📦</span> Lot Size</div>
+        <div class="input-wrap">
+          <input type="number" id="lotInput" placeholder="2" min="0" step="any" oninput="calc()" />
+          <span class="input-unit">lot</span>
+        </div>
+      </div>
+
+      <!-- SL rows -->
+      <div class="sl-section">
+        <div class="sl-header">
+          <div class="sl-title"><span>📉</span> Stop Loss % <span id="slModeLabel">(เปลี่ยนแต่ละ trade)</span></div>
+          <button class="add-btn" onclick="addRow()">＋ เพิ่ม SL row</button>
+        </div>
+        <div class="sl-rows" id="slRows"></div>
+      </div>
+
+      <!-- Results -->
+      <div class="results">
+        <div class="results-header" id="resultsLabel">Result</div>
+        <div class="result-rows" id="resultRows">
+          <div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>
+        </div>
+      </div>
+
+    </div><!-- /fields -->
+
+    <!-- Summary -->
+    <div class="summary" id="summaryBar" style="display:none;">
+      <div class="summary-item">
+        <div class="summary-label">Capital</div>
+        <div class="summary-val" id="sumCapital">—</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Risk %</div>
+        <div class="summary-val" id="sumRisk">—</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Risk Amount</div>
+        <div class="summary-val green" id="sumRiskAmt">—</div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <div class="footer">Position Sizing Calculator · ใช้ใน Trading เท่านั้น</div>
+
+</div><!-- /wrapper -->
+
+<script>
+  let mode = 'A';
+  let slCount = 0;
+  let slIds = [];
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('modeA').classList.toggle('active', m === 'A');
+    document.getElementById('modeB').classList.toggle('active', m === 'B');
+    document.getElementById('lotGroup').style.display = m === 'B' ? '' : 'none';
+    document.getElementById('slModeLabel').textContent = m === 'A' ? '(เปลี่ยนแต่ละ trade)' : '(เปลี่ยนแต่ละ trade)';
+    calc();
+  }
+
+  function addRow() {
+    slCount++;
+    const id = 'sl_' + slCount;
+    slIds.push(id);
+    const container = document.getElementById('slRows');
+    const row = document.createElement('div');
+    row.className = 'sl-row';
+    row.id = 'row_' + id;
+    row.innerHTML = `
+      <div class="sl-row-num">${slIds.length}</div>
+      <div style="position:relative;display:flex;align-items:center;width:100%;">
+        <input type="number" id="${id}" placeholder="0.5" min="0" max="100" step="any" oninput="calc()" />
+        <span class="sl-row-unit">%</span>
+      </div>
+      <button class="sl-row-del" onclick="removeRow('${id}')" title="ลบ">✕</button>
+    `;
+    container.appendChild(row);
+    document.getElementById(id).focus();
+    calc();
+    renumber();
+  }
+
+  function removeRow(id) {
+    slIds = slIds.filter(x => x !== id);
+    const row = document.getElementById('row_' + id);
+    if (row) row.remove();
+    calc();
+    renumber();
+  }
+
+  function renumber() {
+    slIds.forEach((id, i) => {
+      const row = document.getElementById('row_' + id);
+      if (row) row.querySelector('.sl-row-num').textContent = i + 1;
+    });
+  }
+
+  function fmt(n) {
+    if (n === null || isNaN(n)) return '—';
+    if (Math.abs(n) >= 1000) return n.toLocaleString('en-US', {maximumFractionDigits: 2});
+    if (Math.abs(n) >= 1)    return n.toFixed(2);
+    return n.toPrecision(4);
+  }
+
+  function calc() {
+    const capital  = parseFloat(document.getElementById('capital').value);
+    const riskPct  = parseFloat(document.getElementById('riskPct').value);
+    const lotInput = parseFloat(document.getElementById('lotInput').value);
+
+    const resultRows = document.getElementById('resultRows');
+    const summaryBar = document.getElementById('summaryBar');
+    const resultsLabel = document.getElementById('resultsLabel');
+
+    // Mode A: Risk Amount → Lot
+    if (mode === 'A') {
+      resultsLabel.textContent = 'Lot Size per SL';
+
+      if (!capital || !riskPct || slIds.length === 0) {
+        resultRows.innerHTML = '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
+        summaryBar.style.display = 'none';
+        return;
+      }
+
+      const riskAmt = capital * (riskPct / 100);
+      let html = '';
+      let hasAny = false;
+
+      slIds.forEach((id, i) => {
+        const slVal = parseFloat(document.getElementById(id)?.value);
+        if (!slVal || slVal <= 0) {
+          html += `<div class="result-row">
+            <div class="result-row-num">${i+1}</div>
+            <div class="result-main">
+              <div class="result-value">—</div>
+              <div class="result-formula">ใส่ SL%</div>
+            </div>
+            <div class="result-sl-badge">SL —%</div>
+          </div>`;
+          return;
+        }
+        hasAny = true;
+        // Lot = Risk Amount / (Capital × SL%)  → units of "1 lot"
+        const lot = riskAmt / (capital * slVal / 100);
+        const formula = `${fmt(capital)} × ${riskPct}% ÷ ${slVal}%`;
+
+        html += `<div class="result-row">
+          <div class="result-row-num">${i+1}</div>
+          <div class="result-main">
+            <div class="result-value">${fmt(lot)} <span style="font-size:11px;color:var(--text3)">lot</span></div>
+            <div class="result-formula">${formula}</div>
+          </div>
+          <div class="result-sl-badge">SL ${slVal}%</div>
+        </div>`;
+      });
+
+      resultRows.innerHTML = html || '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
+
+      if (hasAny && capital && riskPct) {
+        summaryBar.style.display = 'flex';
+        document.getElementById('sumCapital').textContent  = fmt(capital);
+        document.getElementById('sumRisk').textContent     = riskPct + '%';
+        document.getElementById('sumRiskAmt').textContent  = fmt(riskAmt);
+      } else {
+        summaryBar.style.display = 'none';
+      }
+
+    } else {
+      // Mode B: Lot → Risk Amount
+      resultsLabel.textContent = 'Risk Amount per SL';
+
+      if (!capital || !lotInput || slIds.length === 0) {
+        resultRows.innerHTML = '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
+        summaryBar.style.display = 'none';
+        return;
+      }
+
+      let html = '';
+      let hasAny = false;
+
+      slIds.forEach((id, i) => {
+        const slVal = parseFloat(document.getElementById(id)?.value);
+        if (!slVal || slVal <= 0) {
+          html += `<div class="result-row">
+            <div class="result-row-num">${i+1}</div>
+            <div class="result-main">
+              <div class="result-value blue">—</div>
+              <div class="result-formula">ใส่ SL%</div>
+            </div>
+            <div class="result-sl-badge">SL —%</div>
+          </div>`;
+          return;
+        }
+        hasAny = true;
+        // Risk Amount = Lot × Capital × SL%
+        const riskAmt = lotInput * capital * (slVal / 100);
+        const riskPctCalc = (riskAmt / capital) * 100;
+        const formula = `${fmt(lotInput)} lot × ${fmt(capital)} × ${slVal}%`;
+
+        html += `<div class="result-row">
+          <div class="result-row-num">${i+1}</div>
+          <div class="result-main">
+            <div class="result-value blue">${fmt(riskAmt)} <span style="font-size:11px;color:var(--text3)">${riskPctCalc.toFixed(2)}%</span></div>
+            <div class="result-formula">${formula}</div>
+          </div>
+          <div class="result-sl-badge">SL ${slVal}%</div>
+        </div>`;
+      });
+
+      resultRows.innerHTML = html || '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
+
+      if (hasAny) {
+        summaryBar.style.display = 'flex';
+        document.getElementById('sumCapital').textContent  = fmt(capital);
+        document.getElementById('sumRisk').textContent     = (riskPct || '—') + (riskPct ? '%' : '');
+        document.getElementById('sumRiskAmt').textContent  = fmt(lotInput) + ' lot';
+      } else {
+        summaryBar.style.display = 'none';
+      }
+    }
+  }
+
+  // Add first row on load
+  addRow();
+</script>
+</body>
+</html>
