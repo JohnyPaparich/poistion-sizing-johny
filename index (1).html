@@ -1,719 +1,541 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>Position Sizing</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Position Sizing — Johny Keng</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@500;700&family=Cinzel:wght@700;900&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg: #0a0c10;
-    --surface: #111318;
-    --surface2: #181c24;
-    --border: #1e2330;
-    --border2: #252c3d;
-    --accent: #00e5a0;
-    --accent2: #0090ff;
-    --accent-dim: rgba(0,229,160,0.12);
-    --accent2-dim: rgba(0,144,255,0.12);
-    --red: #ff4560;
-    --red-dim: rgba(255,69,96,0.12);
-    --text: #e2e8f0;
-    --text2: #8892a4;
-    --text3: #4a5568;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'Rajdhani', sans-serif;
-  }
+:root{
+  --bg:#08090d;
+  --surface:rgba(13,16,23,0.93);
+  --surface2:rgba(20,24,34,0.9);
+  --border:#1e2330;
+  --border2:#252c3d;
+  --accent:#00e5a0;
+  --accent2:#0090ff;
+  --accent-dim:rgba(0,229,160,0.12);
+  --red:#ff4560;
+  --red-dim:rgba(255,69,96,0.12);
+  --text:#e2e8f0;
+  --text2:#8892a4;
+  --text3:#4a5568;
+  --gold:#f0c060;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Rajdhani',sans-serif;
+  --display:'Cinzel',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding-bottom:80px;overflow-x:hidden;
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── BACKGROUND ── */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:radial-gradient(ellipse 120% 80% at 50% 0%,#0d1520 0%,#080a0e 60%,#06080a 100%);}
+.bg-grid{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,229,160,0.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,160,0.035) 1px,transparent 1px);
+  background-size:48px 48px;}
+.bg-chart{position:absolute;bottom:80px;left:0;right:0;height:260px;opacity:0.12;}
+.glow-l{position:absolute;width:340px;height:500px;
+  background:radial-gradient(ellipse,rgba(240,120,40,0.2) 0%,transparent 70%);
+  bottom:0;left:-40px;pointer-events:none;}
+.glow-r{position:absolute;width:340px;height:500px;
+  background:radial-gradient(ellipse,rgba(0,144,255,0.14) 0%,transparent 70%);
+  bottom:0;right:-40px;pointer-events:none;}
+.glow-t{position:absolute;width:600px;height:200px;
+  background:radial-gradient(ellipse,rgba(0,229,160,0.07) 0%,transparent 70%);
+  top:0;left:50%;transform:translateX(-50%);pointer-events:none;}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 32px 16px 64px;
-  }
+.char-l{position:absolute;bottom:0;left:0;width:220px;
+  transform-origin:bottom left;animation:bob 5s ease-in-out infinite;
+  filter:drop-shadow(0 0 28px rgba(240,130,40,0.4));}
+.char-r{position:absolute;bottom:0;right:0;width:220px;
+  transform-origin:bottom right;animation:bob 5s ease-in-out infinite reverse;
+  filter:drop-shadow(0 0 28px rgba(0,144,255,0.4));}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
-  /* Background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.35;
-    pointer-events: none;
-  }
+/* ── HERO ── */
+.hero{width:100%;position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;
+  padding:52px 20px 30px;text-align:center;}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  color:var(--accent);text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.badge::before,.badge::after{content:'';width:28px;height:1px;background:var(--accent);opacity:.4;}
+.name{font-family:var(--display);font-size:38px;font-weight:900;letter-spacing:5px;
+  background:linear-gradient(135deg,#fff 20%,var(--gold) 55%,var(--accent) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 18px rgba(0,229,160,0.35));line-height:1.1;}
+.role{font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  color:var(--text3);text-transform:uppercase;margin-top:7px;}
+.role span{color:var(--accent);margin:0 4px;}
+.hline{width:110px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:12px auto 0;opacity:.45;}
 
-  .wrapper {
-    width: 100%;
-    max-width: 520px;
-    position: relative;
-    z-index: 1;
-  }
+/* ── WRAPPER ── */
+.wrapper{width:100%;max-width:520px;padding:0 16px;position:relative;z-index:1;}
 
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 28px;
-  }
-  .header-tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .header-tag::before, .header-tag::after {
-    content: '';
-    width: 32px; height: 1px;
-    background: var(--accent);
-    opacity: 0.5;
-  }
-  .header h1 {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    color: var(--text);
-    line-height: 1.1;
-  }
-  .header h1 span { color: var(--accent); }
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,229,160,0.05),0 24px 64px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.04);
+  backdrop-filter:blur(20px);}
 
-  /* Card */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 0 0 1px rgba(0,229,160,0.04), 0 24px 64px rgba(0,0,0,0.6);
-  }
+.mode-bar{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border2);}
+.mode-btn{background:none;border:none;cursor:pointer;padding:14px 12px;
+  font-family:var(--mono);font-size:11px;color:var(--text2);letter-spacing:.5px;
+  transition:all .2s;position:relative;display:flex;align-items:center;justify-content:center;gap:6px;}
+.mode-btn:first-child{border-right:1px solid var(--border2);}
+.mode-btn.active{color:var(--accent);background:var(--accent-dim);}
+.mode-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--accent);border-radius:2px 2px 0 0;}
+.mode-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
 
-  /* Mode toggle */
-  .mode-bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-bottom: 1px solid var(--border2);
-  }
-  .mode-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 14px 12px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text2);
-    letter-spacing: 0.5px;
-    transition: all 0.2s;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .mode-btn:first-child { border-right: 1px solid var(--border2); }
-  .mode-btn.active {
-    color: var(--accent);
-    background: var(--accent-dim);
-  }
-  .mode-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--accent);
-    border-radius: 2px 2px 0 0;
-  }
-  .mode-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-  }
+.fields{padding:24px 20px 20px;display:flex;flex-direction:column;gap:16px;}
+.field-group{display:flex;flex-direction:column;gap:6px;}
+.field-label{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;
+  color:var(--text2);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.input-wrap{position:relative;display:flex;align-items:center;}
+.input-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+  padding:11px 48px 11px 14px;font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text);
+  outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+.input-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.input-wrap input::placeholder{color:var(--text3);}
+.input-unit{position:absolute;right:14px;font-family:var(--mono);font-size:11px;color:var(--text3);pointer-events:none;}
+.field-hint{font-family:var(--mono);font-size:10px;color:var(--text3);padding-left:2px;}
 
-  /* Fields */
-  .fields {
-    padding: 24px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+.sl-section{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.sl-header{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid var(--border2);}
+.sl-title{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;
+  color:var(--text2);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.add-btn{background:var(--accent-dim);border:1px solid rgba(0,229,160,.2);border-radius:6px;
+  color:var(--accent);font-family:var(--mono);font-size:10px;padding:5px 10px;cursor:pointer;
+  letter-spacing:.5px;transition:all .15s;display:flex;align-items:center;gap:4px;}
+.add-btn:hover{background:rgba(0,229,160,.2);}
+.sl-rows{display:flex;flex-direction:column;}
+.sl-row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;
+  padding:8px 14px;border-bottom:1px solid var(--border);animation:slideIn .2s ease;}
+.sl-row:last-child{border-bottom:none;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.sl-row-num{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;}
+.sl-inp-wrap{position:relative;display:flex;align-items:center;width:100%;}
+.sl-inp-wrap input{background:rgba(10,12,18,.5);border:1px solid var(--border2);border-radius:6px;
+  padding:7px 32px 7px 10px;font-family:var(--mono);font-size:14px;font-weight:600;color:var(--text);
+  outline:none;width:100%;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
+.sl-inp-wrap input:focus{border-color:var(--accent);}
+.sl-unit{position:absolute;right:8px;font-family:var(--mono);font-size:10px;color:var(--text3);pointer-events:none;}
+.sl-del{background:none;border:none;color:var(--text3);cursor:pointer;
+  font-size:15px;padding:4px 6px;border-radius:4px;line-height:1;transition:all .15s;margin-left:4px;}
+.sl-del:hover{color:var(--red);background:var(--red-dim);}
 
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .field-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    color: var(--text2);
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .field-label .icon { font-size: 13px; }
+.results{margin-top:4px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.results-header{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;
+  color:var(--text2);text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:6px;}
+.results-header::before{content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 6px var(--accent);flex-shrink:0;}
+.result-rows{display:flex;flex-direction:column;}
+.result-row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;
+  padding:10px 14px;border-bottom:1px solid var(--border);}
+.result-row:last-child{border-bottom:none;}
+.result-row-num{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;}
+.result-main{display:flex;flex-direction:column;gap:2px;}
+.result-value{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent);line-height:1.2;}
+.result-value.blue{color:var(--accent2);}
+.result-formula{font-family:var(--mono);font-size:10px;color:var(--text3);}
+.result-sl{background:rgba(10,12,18,.5);border:1px solid var(--border2);
+  border-radius:6px;padding:4px 8px;font-family:var(--mono);font-size:10px;color:var(--text2);white-space:nowrap;}
 
-  .input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .input-wrap input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 8px;
-    padding: 11px 48px 11px 14px;
-    font-family: var(--mono);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .input-wrap input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-dim);
-  }
-  .input-wrap input::placeholder { color: var(--text3); }
-  .input-unit {
-    position: absolute;
-    right: 14px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text3);
-    pointer-events: none;
-  }
+.summary{margin:0 20px 20px;
+  background:linear-gradient(135deg,rgba(0,229,160,.06),rgba(0,144,255,.04));
+  border:1px solid rgba(0,229,160,.15);border-radius:10px;padding:14px 16px;
+  display:flex;gap:16px;flex-wrap:wrap;}
+.sum-item{display:flex;flex-direction:column;gap:3px;flex:1;min-width:80px;}
+.sum-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;}
+.sum-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);}
+.sum-val.g{color:var(--accent);}
+.no-result{padding:24px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3);}
+.footer{text-align:center;margin-top:24px;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.5px;position:relative;z-index:1;}
 
-  /* Subtitle hint */
-  .field-hint {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    padding-left: 2px;
-  }
-
-  /* SL Section */
-  .sl-section {
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .sl-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border2);
-  }
-  .sl-title {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    color: var(--text2);
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .add-btn {
-    background: var(--accent-dim);
-    border: 1px solid rgba(0,229,160,0.2);
-    border-radius: 6px;
-    color: var(--accent);
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 5px 10px;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .add-btn:hover { background: rgba(0,229,160,0.2); }
-
-  .sl-rows { display: flex; flex-direction: column; }
-  .sl-row {
-    display: grid;
-    grid-template-columns: 32px 1fr auto auto;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-bottom: 1px solid var(--border);
-    animation: slideIn 0.2s ease;
-  }
-  .sl-row:last-child { border-bottom: none; }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .sl-row-num {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    text-align: center;
-  }
-  .sl-row input {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 6px;
-    padding: 7px 36px 7px 10px;
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    outline: none;
-    width: 100%;
-    transition: border-color 0.15s;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .sl-row input:focus { border-color: var(--accent); }
-  .sl-row-unit {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    margin-left: -32px;
-    pointer-events: none;
-    width: 28px;
-    text-align: right;
-  }
-  .sl-row-del {
-    background: none;
-    border: none;
-    color: var(--text3);
-    cursor: pointer;
-    font-size: 16px;
-    padding: 4px 6px;
-    border-radius: 4px;
-    line-height: 1;
-    transition: all 0.15s;
-  }
-  .sl-row-del:hover { color: var(--red); background: var(--red-dim); }
-
-  /* Results */
-  .results {
-    margin-top: 4px;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .results-header {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    color: var(--text2);
-    text-transform: uppercase;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border2);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .results-header::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 6px var(--accent);
-    flex-shrink: 0;
-  }
-
-  .result-rows { display: flex; flex-direction: column; }
-  .result-row {
-    display: grid;
-    grid-template-columns: 32px 1fr auto;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-  }
-  .result-row:last-child { border-bottom: none; }
-  .result-row:hover { background: rgba(255,255,255,0.02); }
-  .result-row-num {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    text-align: center;
-  }
-  .result-main {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .result-value {
-    font-family: var(--mono);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--accent);
-    line-height: 1.2;
-  }
-  .result-value.blue { color: var(--accent2); }
-  .result-formula {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    line-height: 1.4;
-  }
-  .result-sl-badge {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text2);
-    white-space: nowrap;
-  }
-
-  /* Summary bar */
-  .summary {
-    margin: 0 20px 20px;
-    background: linear-gradient(135deg, rgba(0,229,160,0.06), rgba(0,144,255,0.04));
-    border: 1px solid rgba(0,229,160,0.15);
-    border-radius: 10px;
-    padding: 14px 16px;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .summary-item {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    flex: 1;
-    min-width: 80px;
-  }
-  .summary-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    color: var(--text3);
-    text-transform: uppercase;
-  }
-  .summary-val {
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .summary-val.green { color: var(--accent); }
-
-  .no-result {
-    padding: 24px;
-    text-align: center;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text3);
-  }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 20px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    letter-spacing: 0.5px;
-  }
-
-  /* Number input spinners hide */
-  input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type=number] { -moz-appearance: textfield; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-moz-appearance:textfield;}
 </style>
 </head>
 <body>
+
+<!-- ── BACKGROUND ── -->
+<div class="bg">
+  <div class="bg-grid"></div>
+  <div class="glow-t"></div>
+  <div class="glow-l"></div>
+  <div class="glow-r"></div>
+
+  <!-- Ambient chart -->
+  <svg class="bg-chart" viewBox="0 0 1200 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cf" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#00e5a0" stop-opacity=".25"/>
+        <stop offset="100%" stop-color="#00e5a0" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,200 L80,175 L160,188 L240,142 L320,158 L400,108 L480,128 L560,78 L640,98 L720,58 L800,82 L880,44 L960,62 L1040,36 L1120,52 L1200,40" fill="none" stroke="#00e5a0" stroke-width="2" opacity=".6"/>
+    <path d="M0,200 L80,175 L160,188 L240,142 L320,158 L400,108 L480,128 L560,78 L640,98 L720,58 L800,82 L880,44 L960,62 L1040,36 L1120,52 L1200,40 L1200,260 L0,260Z" fill="url(#cf)"/>
+    <rect x="80" y="145" width="10" height="38" rx="1" fill="#00e5a0" opacity=".4"/>
+    <rect x="160" y="128" width="10" height="50" rx="1" fill="#ff4560" opacity=".35"/>
+    <rect x="240" y="108" width="10" height="40" rx="1" fill="#00e5a0" opacity=".4"/>
+    <rect x="320" y="90" width="10" height="55" rx="1" fill="#00e5a0" opacity=".35"/>
+    <rect x="400" y="72" width="10" height="44" rx="1" fill="#ff4560" opacity=".3"/>
+    <rect x="480" y="55" width="10" height="52" rx="1" fill="#00e5a0" opacity=".4"/>
+    <rect x="560" y="40" width="10" height="36" rx="1" fill="#00e5a0" opacity=".35"/>
+    <rect x="640" y="28" width="10" height="56" rx="1" fill="#ff4560" opacity=".3"/>
+  </svg>
+
+  <!-- ═══ CHIBI LEFT: Carpenter Johny ═══ -->
+  <svg class="char-l" viewBox="0 0 220 420" xmlns="http://www.w3.org/2000/svg">
+    <!-- Ground shadow -->
+    <ellipse cx="100" cy="415" rx="68" ry="7" fill="rgba(0,0,0,0.45)"/>
+    <!-- Boots -->
+    <rect x="70" y="358" width="30" height="22" rx="8" fill="#7a5028"/>
+    <rect x="108" y="358" width="30" height="22" rx="8" fill="#7a5028"/>
+    <ellipse cx="85" cy="378" rx="26" ry="10" fill="#8b6030"/>
+    <ellipse cx="123" cy="378" rx="26" ry="10" fill="#8b6030"/>
+    <!-- Boot laces -->
+    <line x1="76" y1="364" x2="94" y2="364" stroke="#d4a060" stroke-width="1.5"/>
+    <line x1="76" y1="370" x2="94" y2="370" stroke="#d4a060" stroke-width="1.5"/>
+    <line x1="114" y1="364" x2="132" y2="364" stroke="#d4a060" stroke-width="1.5"/>
+    <line x1="114" y1="370" x2="132" y2="370" stroke="#d4a060" stroke-width="1.5"/>
+    <!-- Cargo shorts -->
+    <rect x="64" y="290" width="80" height="76" rx="8" fill="#c8a870"/>
+    <line x1="104" y1="290" x2="104" y2="366" stroke="#b89850" stroke-width="2"/>
+    <!-- Cargo pockets -->
+    <rect x="68" y="310" width="22" height="20" rx="4" fill="#b89050" stroke="#a88040" stroke-width="1"/>
+    <rect x="118" y="310" width="22" height="20" rx="4" fill="#b89050" stroke="#a88040" stroke-width="1"/>
+    <!-- Tool belt -->
+    <rect x="60" y="284" width="88" height="14" rx="5" fill="#3a2810"/>
+    <rect x="65" y="282" width="16" height="18" rx="3" fill="#2a1e08"/>
+    <rect x="86" y="282" width="12" height="18" rx="3" fill="#2a1e08"/>
+    <rect x="112" y="282" width="12" height="18" rx="3" fill="#2a1e08"/>
+    <!-- Tool belt buckle -->
+    <rect x="98" y="283" width="12" height="12" rx="2" fill="#c8a840"/>
+    <!-- Hi-vis vest -->
+    <rect x="60" y="200" width="88" height="92" rx="8" fill="#9ec818"/>
+    <!-- Vest reflective stripes -->
+    <rect x="60" y="234" width="88" height="8" rx="2" fill="#ffe840" opacity=".75"/>
+    <rect x="60" y="256" width="88" height="8" rx="2" fill="#ffe840" opacity=".75"/>
+    <!-- Shirt under vest (grey camo) -->
+    <rect x="74" y="200" width="60" height="50" rx="4" fill="#9aacbc"/>
+    <!-- Camo pattern -->
+    <ellipse cx="84" cy="215" rx="5" ry="3" fill="#8a9cac" opacity=".5"/>
+    <ellipse cx="100" cy="225" rx="6" ry="3" fill="#8a9cac" opacity=".4"/>
+    <ellipse cx="118" cy="212" rx="4" ry="3" fill="#8a9cac" opacity=".5"/>
+    <!-- Name badge -->
+    <rect x="68" y="206" width="28" height="14" rx="3" fill="white" opacity=".9"/>
+    <text x="74" y="217" font-family="Arial" font-size="5.5" fill="#1a5a8a" font-weight="bold">JOHNY</text>
+    <!-- LEFT ARM (holding hammer) -->
+    <rect x="28" y="202" width="36" height="14" rx="7" fill="#9ec818" transform="rotate(65,46,209)"/>
+    <rect x="14" y="255" width="26" height="15" rx="7" fill="#c8956a"/>
+    <!-- Tattoo on left arm -->
+    <path d="M20,262 Q26,268 22,276" stroke="#6840a0" stroke-width="2" fill="none" opacity=".7"/>
+    <path d="M24,268 Q18,273 22,280" stroke="#8060b8" stroke-width="1.5" fill="none" opacity=".6"/>
+    <!-- Hammer -->
+    <g transform="translate(8,290) rotate(-10)">
+      <rect x="2" y="0" width="7" height="50" rx="3" fill="#7a5028"/>
+      <rect x="-6" y="-4" width="22" height="16" rx="3" fill="#666"/>
+      <rect x="-3" y="-2" width="6" height="12" rx="2" fill="#888"/>
+    </g>
+    <!-- RIGHT ARM (up waving) -->
+    <rect x="152" y="202" width="34" height="14" rx="7" fill="#9ec818" transform="rotate(-55,169,209)"/>
+    <rect x="166" y="170" width="24" height="14" rx="7" fill="#c8956a"/>
+    <!-- Makita drill in right hand -->
+    <g transform="translate(158,148) rotate(20)">
+      <rect x="0" y="0" width="30" height="15" rx="4" fill="#1a62a0"/>
+      <rect x="9" y="-8" width="12" height="12" rx="2" fill="#2a1e08"/>
+      <rect x="11" y="15" width="8" height="10" rx="2" fill="#0a7acc"/>
+      <circle cx="6" cy="7" r="4.5" fill="#111" stroke="#333" stroke-width="1"/>
+      <circle cx="6" cy="7" r="1.5" fill="#444"/>
+      <text x="5" y="30" font-family="Arial" font-size="4.5" fill="#f0c060" font-weight="bold">18V</text>
+    </g>
+    <!-- NECK -->
+    <rect x="92" y="180" width="24" height="28" rx="10" fill="#c8956a"/>
+    <!-- HEAD -->
+    <ellipse cx="104" cy="152" rx="46" ry="48" fill="#c8956a"/>
+    <!-- Hard hat -->
+    <ellipse cx="104" cy="116" rx="52" ry="16" fill="#f0f0f0"/>
+    <ellipse cx="104" cy="112" rx="46" ry="26" fill="#f5f5f5"/>
+    <rect x="52" y="122" width="104" height="10" rx="4" fill="#e8e8e8"/>
+    <ellipse cx="104" cy="132" rx="52" ry="6" fill="rgba(0,0,0,0.12)"/>
+    <!-- Safety sticker on hat -->
+    <rect x="90" y="106" width="28" height="14" rx="2" fill="#ffe840" opacity=".8"/>
+    <text x="96" y="117" font-family="Arial" font-size="7" fill="#1a1a1a" font-weight="bold">SAFE</text>
+    <!-- HAIR (visible under hat edge) -->
+    <path d="M58,138 Q60,105 104,102 Q148,102 150,132" fill="#1a0e08"/>
+    <!-- EYES — happy squint crescent -->
+    <path d="M84,150 Q90,142 96,150" stroke="#2a1008" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M112,150 Q118,142 124,150" stroke="#2a1008" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- Big open smile -->
+    <path d="M86,164 Q104,182 122,164" stroke="#2a1008" stroke-width="3" fill="rgba(180,80,60,0.3)" stroke-linecap="round"/>
+    <!-- Teeth -->
+    <path d="M88,167 Q104,178 120,167" fill="white" opacity=".8"/>
+    <!-- Ear stud (left) -->
+    <circle cx="58" cy="156" r="4" fill="#f0c060" stroke="#c8a030" stroke-width="1.5"/>
+    <!-- Speech bubble -->
+    <g transform="translate(105,48)">
+      <rect x="0" y="0" width="100" height="50" rx="12" fill="rgba(0,229,160,0.12)" stroke="rgba(0,229,160,0.45)" stroke-width="1.5"/>
+      <polygon points="10,50 4,66 28,50" fill="rgba(0,229,160,0.12)" stroke="rgba(0,229,160,0.45)" stroke-width="1.5"/>
+      <text x="10" y="18" font-family="Arial" font-size="8.5" fill="#00e5a0" font-weight="bold">Carpenter</text>
+      <text x="16" y="32" font-family="Arial" font-size="8.5" fill="#00e5a0" font-weight="bold">&amp; Trader 📈</text>
+      <text x="26" y="46" font-family="Arial" font-size="9">⚒️ 🪵</text>
+    </g>
+  </svg>
+
+  <!-- ═══ CHIBI RIGHT: Party/Smart Johny ═══ -->
+  <svg class="char-r" viewBox="0 0 220 420" xmlns="http://www.w3.org/2000/svg">
+    <!-- Ground shadow -->
+    <ellipse cx="110" cy="415" rx="68" ry="7" fill="rgba(0,0,0,0.45)"/>
+    <!-- Dress shoes -->
+    <rect x="72" y="358" width="32" height="20" rx="8" fill="#1a1a30"/>
+    <rect x="114" y="358" width="32" height="20" rx="8" fill="#1a1a30"/>
+    <ellipse cx="88" cy="376" rx="28" ry="9" fill="#22223c"/>
+    <ellipse cx="130" cy="376" rx="28" ry="9" fill="#22223c"/>
+    <!-- Dress pants -->
+    <rect x="66" y="288" width="80" height="78" rx="8" fill="#1c1c3a"/>
+    <line x1="106" y1="288" x2="106" y2="366" stroke="#14142e" stroke-width="2.5"/>
+    <!-- Pant crease shine -->
+    <line x1="80" y1="295" x2="82" y2="365" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+    <line x1="120" y1="295" x2="118" y2="365" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+    <!-- BLAZER body -->
+    <rect x="60" y="200" width="92" height="96" rx="10" fill="#28285a"/>
+    <!-- Blazer lapels / V -->
+    <polygon points="106,200 84,236 106,222" fill="#1e1e48"/>
+    <polygon points="106,200 128,236 106,222" fill="#1e1e48"/>
+    <!-- Pocket square -->
+    <rect x="118" y="208" width="14" height="10" rx="2" fill="white" opacity=".7"/>
+    <path d="M120,208 L125,204 L130,208" fill="white" opacity=".5"/>
+    <!-- White shirt -->
+    <rect x="95" y="200" width="22" height="56" rx="4" fill="#ebebf5"/>
+    <!-- Shirt buttons -->
+    <circle cx="106" cy="212" r="2" fill="#aaa"/>
+    <circle cx="106" cy="224" r="2" fill="#aaa"/>
+    <circle cx="106" cy="236" r="2" fill="#aaa"/>
+    <!-- LEFT ARM — rock hand (index+pinky up) -->
+    <rect x="28" y="206" width="36" height="14" rx="7" fill="#28285a" transform="rotate(55,46,213)"/>
+    <rect x="18" y="255" width="26" height="16" rx="8" fill="#c8956a"/>
+    <!-- Rock hand fingers left -->
+    <rect x="18" y="238" width="9" height="22" rx="5" fill="#c8956a"/>
+    <rect x="30" y="248" width="9" height="16" rx="4" fill="#c8956a" opacity=".7"/>
+    <rect x="18" y="272" width="9" height="18" rx="5" fill="#c8956a"/>
+    <!-- RIGHT ARM — rock hand -->
+    <rect x="154" y="206" width="36" height="14" rx="7" fill="#28285a" transform="rotate(-55,172,213)"/>
+    <rect x="174" y="255" width="26" height="16" rx="8" fill="#c8956a"/>
+    <!-- Rock hand fingers right -->
+    <rect x="190" y="238" width="9" height="22" rx="5" fill="#c8956a"/>
+    <rect x="178" y="248" width="9" height="16" rx="4" fill="#c8956a" opacity=".7"/>
+    <rect x="190" y="272" width="9" height="18" rx="5" fill="#c8956a"/>
+    <!-- NECK -->
+    <rect x="94" y="180" width="24" height="28" rx="10" fill="#c8956a"/>
+    <!-- HEAD -->
+    <ellipse cx="106" cy="150" rx="47" ry="49" fill="#c8956a"/>
+    <!-- HAIR styled -->
+    <path d="M60,138 Q62,96 106,93 Q150,93 152,132" fill="#1a0e08"/>
+    <!-- Side fade lines -->
+    <path d="M60,150 Q57,140 60,126 Q63,112 70,104" stroke="#c8956a" stroke-width="14" fill="none" opacity=".75" stroke-linecap="round"/>
+    <path d="M152,150 Q155,140 152,126" stroke="#c8956a" stroke-width="12" fill="none" opacity=".75" stroke-linecap="round"/>
+    <!-- Hair detail top -->
+    <path d="M74,98 Q90,88 106,87 Q122,88 134,96" stroke="#2a1408" stroke-width="3" fill="none"/>
+    <!-- EYES — big happy sparkling -->
+    <ellipse cx="90" cy="149" rx="9" ry="10" fill="white" stroke="#2a1008" stroke-width="1"/>
+    <ellipse cx="122" cy="149" rx="9" ry="10" fill="white" stroke="#2a1008" stroke-width="1"/>
+    <circle cx="92" cy="150" r="6" fill="#2a1008"/>
+    <circle cx="124" cy="150" r="6" fill="#2a1008"/>
+    <circle cx="93.5" cy="148" r="2.5" fill="white"/>
+    <circle cx="125.5" cy="148" r="2.5" fill="white"/>
+    <!-- Star sparkles in eyes -->
+    <circle cx="87" cy="145" r="1" fill="white" opacity=".6"/>
+    <circle cx="119" cy="145" r="1" fill="white" opacity=".6"/>
+    <!-- MOUTH — huge open smile -->
+    <path d="M82,165 Q106,190 130,165" fill="#2a1008"/>
+    <path d="M86,168 Q106,182 126,168" fill="white"/>
+    <!-- Dimples -->
+    <circle cx="78" cy="163" r="3" fill="#b88060" opacity=".4"/>
+    <circle cx="134" cy="163" r="3" fill="#b88060" opacity=".4"/>
+    <!-- EARRING left -->
+    <circle cx="59" cy="155" r="4.5" fill="#f0c060" stroke="#c8a030" stroke-width="1.5"/>
+    <!-- Mini chart floating left -->
+    <g transform="translate(-8,52)" opacity=".9">
+      <rect x="0" y="0" width="72" height="54" rx="9" fill="rgba(0,15,30,0.75)" stroke="rgba(0,144,255,0.5)" stroke-width="1.5"/>
+      <text x="7" y="12" font-family="Arial" font-size="6" fill="#0090ff" letter-spacing="0.5">POSITION SIZE</text>
+      <line x1="6" y1="16" x2="66" y2="16" stroke="#0090ff" stroke-width=".5" opacity=".4"/>
+      <polyline points="8,44 16,35 24,39 32,26 40,30 48,19 56,23 65,16" fill="none" stroke="#00e5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="8" y="52" font-family="Arial" font-size="6" fill="#00e5a0" font-weight="bold">+12.4% 🚀</text>
+    </g>
+    <!-- Speech bubble right side -->
+    <g transform="translate(-90,50)">
+      <rect x="0" y="0" width="84" height="46" rx="11" fill="rgba(240,192,96,0.12)" stroke="rgba(240,192,96,0.4)" stroke-width="1.5"/>
+      <polygon points="74,46 80,62 60,46" fill="rgba(240,192,96,0.12)" stroke="rgba(240,192,96,0.4)" stroke-width="1.5"/>
+      <text x="8" y="16" font-family="Arial" font-size="8" fill="#f0c060" font-weight="bold">Let's Trade!</text>
+      <text x="12" y="30" font-family="Arial" font-size="8" fill="#f0c060" font-weight="bold">📊 ฿💰</text>
+      <text x="22" y="43" font-family="Arial" font-size="9">🤘🤘</text>
+    </g>
+  </svg>
+
+</div><!-- /bg -->
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="badge">⚡ Risk Calculator</div>
+  <div class="name">JOHNY KENG</div>
+  <div class="role"><span>Carpenter</span>·<span>Trader</span>· Builder</div>
+  <div class="hline"></div>
+</div>
+
+<!-- ── CALCULATOR ── -->
 <div class="wrapper">
-
-  <div class="header">
-    <div class="header-tag">⚡ RISK CALCULATOR</div>
-    <h1>Position <span>Sizing</span></h1>
-  </div>
-
   <div class="card">
-    <!-- Mode Toggle -->
     <div class="mode-bar">
       <button class="mode-btn active" id="modeA" onclick="setMode('A')">
-        <span class="mode-dot"></span>
-        Risk Amount → Lot
+        <span class="mode-dot"></span>Risk Amount → Lot
       </button>
       <button class="mode-btn" id="modeB" onclick="setMode('B')">
-        <span class="mode-dot"></span>
-        Lot → Risk Amount
+        <span class="mode-dot"></span>Lot → Risk Amount
       </button>
     </div>
 
-    <!-- Inputs -->
     <div class="fields">
-
-      <!-- Capital -->
       <div class="field-group">
-        <div class="field-label"><span class="icon">💰</span> เงินทุน / Capital</div>
+        <div class="field-label">💰 เงินทุน / Capital</div>
         <div class="input-wrap">
-          <input type="number" id="capital" placeholder="10000" min="0" step="any" oninput="calc()" />
+          <input type="number" id="capital" placeholder="10000" min="0" step="any" oninput="calc()"/>
           <span class="input-unit">฿ / $</span>
         </div>
         <div class="field-hint">USD / THB / ฿ (หน่วยใดก็ได้)</div>
       </div>
 
-      <!-- Risk % -->
       <div class="field-group">
-        <div class="field-label"><span class="icon">🎯</span> Risk % ต่อเทรด</div>
+        <div class="field-label">🎯 Risk % ต่อเทรด</div>
         <div class="input-wrap">
-          <input type="number" id="riskPct" placeholder="1" min="0" max="100" step="any" oninput="calc()" />
+          <input type="number" id="riskPct" placeholder="1" min="0" max="100" step="any" oninput="calc()"/>
           <span class="input-unit">%</span>
         </div>
         <div class="field-hint">เช่น 1 = เสียไม่เกิน 1% ต่อ position</div>
       </div>
 
-      <!-- Lot (mode B only) -->
-      <div class="field-group" id="lotGroup" style="display:none;">
-        <div class="field-label"><span class="icon">📦</span> Lot Size</div>
+      <div class="field-group" id="lotGroup" style="display:none">
+        <div class="field-label">📦 Lot Size</div>
         <div class="input-wrap">
-          <input type="number" id="lotInput" placeholder="2" min="0" step="any" oninput="calc()" />
+          <input type="number" id="lotInput" placeholder="2" min="0" step="any" oninput="calc()"/>
           <span class="input-unit">lot</span>
         </div>
       </div>
 
-      <!-- SL rows -->
       <div class="sl-section">
         <div class="sl-header">
-          <div class="sl-title"><span>📉</span> Stop Loss % <span id="slModeLabel">(เปลี่ยนแต่ละ trade)</span></div>
+          <div class="sl-title">📉 Stop Loss % (เปลี่ยนแต่ละ trade)</div>
           <button class="add-btn" onclick="addRow()">＋ เพิ่ม SL row</button>
         </div>
         <div class="sl-rows" id="slRows"></div>
       </div>
 
-      <!-- Results -->
       <div class="results">
         <div class="results-header" id="resultsLabel">Result</div>
         <div class="result-rows" id="resultRows">
           <div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>
         </div>
       </div>
-
-    </div><!-- /fields -->
-
-    <!-- Summary -->
-    <div class="summary" id="summaryBar" style="display:none;">
-      <div class="summary-item">
-        <div class="summary-label">Capital</div>
-        <div class="summary-val" id="sumCapital">—</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-label">Risk %</div>
-        <div class="summary-val" id="sumRisk">—</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-label">Risk Amount</div>
-        <div class="summary-val green" id="sumRiskAmt">—</div>
-      </div>
     </div>
 
-  </div><!-- /card -->
+    <div class="summary" id="summaryBar" style="display:none">
+      <div class="sum-item"><div class="sum-label">Capital</div><div class="sum-val" id="sumCapital">—</div></div>
+      <div class="sum-item"><div class="sum-label">Risk %</div><div class="sum-val" id="sumRisk">—</div></div>
+      <div class="sum-item"><div class="sum-label">Risk Amount</div><div class="sum-val g" id="sumRiskAmt">—</div></div>
+    </div>
+  </div>
 
-  <div class="footer">Position Sizing Calculator · ใช้ใน Trading เท่านั้น</div>
-
-</div><!-- /wrapper -->
+  <div class="footer">Position Sizing · Johny Keng © 2025</div>
+</div>
 
 <script>
-  let mode = 'A';
-  let slCount = 0;
-  let slIds = [];
-
-  function setMode(m) {
-    mode = m;
-    document.getElementById('modeA').classList.toggle('active', m === 'A');
-    document.getElementById('modeB').classList.toggle('active', m === 'B');
-    document.getElementById('lotGroup').style.display = m === 'B' ? '' : 'none';
-    document.getElementById('slModeLabel').textContent = m === 'A' ? '(เปลี่ยนแต่ละ trade)' : '(เปลี่ยนแต่ละ trade)';
-    calc();
-  }
-
-  function addRow() {
-    slCount++;
-    const id = 'sl_' + slCount;
-    slIds.push(id);
-    const container = document.getElementById('slRows');
-    const row = document.createElement('div');
-    row.className = 'sl-row';
-    row.id = 'row_' + id;
-    row.innerHTML = `
-      <div class="sl-row-num">${slIds.length}</div>
-      <div style="position:relative;display:flex;align-items:center;width:100%;">
-        <input type="number" id="${id}" placeholder="0.5" min="0" max="100" step="any" oninput="calc()" />
-        <span class="sl-row-unit">%</span>
-      </div>
-      <button class="sl-row-del" onclick="removeRow('${id}')" title="ลบ">✕</button>
-    `;
-    container.appendChild(row);
-    document.getElementById(id).focus();
-    calc();
-    renumber();
-  }
-
-  function removeRow(id) {
-    slIds = slIds.filter(x => x !== id);
-    const row = document.getElementById('row_' + id);
-    if (row) row.remove();
-    calc();
-    renumber();
-  }
-
-  function renumber() {
-    slIds.forEach((id, i) => {
-      const row = document.getElementById('row_' + id);
-      if (row) row.querySelector('.sl-row-num').textContent = i + 1;
+let mode='A',slCount=0,slIds=[];
+function setMode(m){
+  mode=m;
+  document.getElementById('modeA').classList.toggle('active',m==='A');
+  document.getElementById('modeB').classList.toggle('active',m==='B');
+  document.getElementById('lotGroup').style.display=m==='B'?'':'none';
+  calc();
+}
+function addRow(){
+  slCount++;const id='sl_'+slCount;slIds.push(id);
+  const c=document.getElementById('slRows');
+  const row=document.createElement('div');
+  row.className='sl-row';row.id='row_'+id;
+  row.innerHTML=`<div class="sl-row-num">${slIds.length}</div>
+    <div class="sl-inp-wrap">
+      <input type="number" id="${id}" placeholder="0.5" min="0" max="100" step="any" oninput="calc()"/>
+      <span class="sl-unit">%</span>
+    </div>
+    <button class="sl-del" onclick="removeRow('${id}')">✕</button>`;
+  c.appendChild(row);
+  document.getElementById(id).focus();
+  calc();renumber();
+}
+function removeRow(id){
+  slIds=slIds.filter(x=>x!==id);
+  const r=document.getElementById('row_'+id);if(r)r.remove();
+  calc();renumber();
+}
+function renumber(){
+  slIds.forEach((id,i)=>{const r=document.getElementById('row_'+id);if(r)r.querySelector('.sl-row-num').textContent=i+1;});
+}
+function fmt(n){
+  if(n===null||isNaN(n))return'—';
+  if(Math.abs(n)>=1000)return n.toLocaleString('en-US',{maximumFractionDigits:2});
+  if(Math.abs(n)>=1)return n.toFixed(2);
+  return n.toPrecision(4);
+}
+function calc(){
+  const capital=parseFloat(document.getElementById('capital').value);
+  const riskPct=parseFloat(document.getElementById('riskPct').value);
+  const lotInput=parseFloat(document.getElementById('lotInput').value);
+  const resultRows=document.getElementById('resultRows');
+  const summaryBar=document.getElementById('summaryBar');
+  const resultsLabel=document.getElementById('resultsLabel');
+  if(mode==='A'){
+    resultsLabel.textContent='Lot Size per SL';
+    if(!capital||!riskPct||slIds.length===0){resultRows.innerHTML='<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';summaryBar.style.display='none';return;}
+    const riskAmt=capital*(riskPct/100);let html='',hasAny=false;
+    slIds.forEach((id,i)=>{
+      const slVal=parseFloat(document.getElementById(id)?.value);
+      if(!slVal||slVal<=0){html+=`<div class="result-row"><div class="result-row-num">${i+1}</div><div class="result-main"><div class="result-value">—</div><div class="result-formula">ใส่ SL%</div></div><div class="result-sl">SL —%</div></div>`;return;}
+      hasAny=true;
+      const lot=riskAmt/(capital*slVal/100);
+      html+=`<div class="result-row"><div class="result-row-num">${i+1}</div><div class="result-main"><div class="result-value">${fmt(lot)} <span style="font-size:11px;color:var(--text3)">lot</span></div><div class="result-formula">${fmt(capital)} × ${riskPct}% ÷ ${slVal}%</div></div><div class="result-sl">SL ${slVal}%</div></div>`;
     });
+    resultRows.innerHTML=html||'<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
+    if(hasAny&&capital&&riskPct){summaryBar.style.display='flex';document.getElementById('sumCapital').textContent=fmt(capital);document.getElementById('sumRisk').textContent=riskPct+'%';document.getElementById('sumRiskAmt').textContent=fmt(riskAmt);}else summaryBar.style.display='none';
+  }else{
+    resultsLabel.textContent='Risk Amount per SL';
+    if(!capital||!lotInput||slIds.length===0){resultRows.innerHTML='<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';summaryBar.style.display='none';return;}
+    let html='',hasAny=false;
+    slIds.forEach((id,i)=>{
+      const slVal=parseFloat(document.getElementById(id)?.value);
+      if(!slVal||slVal<=0){html+=`<div class="result-row"><div class="result-row-num">${i+1}</div><div class="result-main"><div class="result-value blue">—</div><div class="result-formula">ใส่ SL%</div></div><div class="result-sl">SL —%</div></div>`;return;}
+      hasAny=true;
+      const riskAmt=lotInput*capital*(slVal/100);
+      const rp=(riskAmt/capital)*100;
+      html+=`<div class="result-row"><div class="result-row-num">${i+1}</div><div class="result-main"><div class="result-value blue">${fmt(riskAmt)} <span style="font-size:11px;color:var(--text3)">${rp.toFixed(2)}%</span></div><div class="result-formula">${fmt(lotInput)} lot × ${fmt(capital)} × ${slVal}%</div></div><div class="result-sl">SL ${slVal}%</div></div>`;
+    });
+    resultRows.innerHTML=html||'<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
+    if(hasAny){summaryBar.style.display='flex';document.getElementById('sumCapital').textContent=fmt(capital);document.getElementById('sumRisk').textContent=(riskPct||'—')+(riskPct?'%':'');document.getElementById('sumRiskAmt').textContent=fmt(lotInput)+' lot';}else summaryBar.style.display='none';
   }
-
-  function fmt(n) {
-    if (n === null || isNaN(n)) return '—';
-    if (Math.abs(n) >= 1000) return n.toLocaleString('en-US', {maximumFractionDigits: 2});
-    if (Math.abs(n) >= 1)    return n.toFixed(2);
-    return n.toPrecision(4);
-  }
-
-  function calc() {
-    const capital  = parseFloat(document.getElementById('capital').value);
-    const riskPct  = parseFloat(document.getElementById('riskPct').value);
-    const lotInput = parseFloat(document.getElementById('lotInput').value);
-
-    const resultRows = document.getElementById('resultRows');
-    const summaryBar = document.getElementById('summaryBar');
-    const resultsLabel = document.getElementById('resultsLabel');
-
-    // Mode A: Risk Amount → Lot
-    if (mode === 'A') {
-      resultsLabel.textContent = 'Lot Size per SL';
-
-      if (!capital || !riskPct || slIds.length === 0) {
-        resultRows.innerHTML = '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
-        summaryBar.style.display = 'none';
-        return;
-      }
-
-      const riskAmt = capital * (riskPct / 100);
-      let html = '';
-      let hasAny = false;
-
-      slIds.forEach((id, i) => {
-        const slVal = parseFloat(document.getElementById(id)?.value);
-        if (!slVal || slVal <= 0) {
-          html += `<div class="result-row">
-            <div class="result-row-num">${i+1}</div>
-            <div class="result-main">
-              <div class="result-value">—</div>
-              <div class="result-formula">ใส่ SL%</div>
-            </div>
-            <div class="result-sl-badge">SL —%</div>
-          </div>`;
-          return;
-        }
-        hasAny = true;
-        // Lot = Risk Amount / (Capital × SL%)  → units of "1 lot"
-        const lot = riskAmt / (capital * slVal / 100);
-        const formula = `${fmt(capital)} × ${riskPct}% ÷ ${slVal}%`;
-
-        html += `<div class="result-row">
-          <div class="result-row-num">${i+1}</div>
-          <div class="result-main">
-            <div class="result-value">${fmt(lot)} <span style="font-size:11px;color:var(--text3)">lot</span></div>
-            <div class="result-formula">${formula}</div>
-          </div>
-          <div class="result-sl-badge">SL ${slVal}%</div>
-        </div>`;
-      });
-
-      resultRows.innerHTML = html || '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
-
-      if (hasAny && capital && riskPct) {
-        summaryBar.style.display = 'flex';
-        document.getElementById('sumCapital').textContent  = fmt(capital);
-        document.getElementById('sumRisk').textContent     = riskPct + '%';
-        document.getElementById('sumRiskAmt').textContent  = fmt(riskAmt);
-      } else {
-        summaryBar.style.display = 'none';
-      }
-
-    } else {
-      // Mode B: Lot → Risk Amount
-      resultsLabel.textContent = 'Risk Amount per SL';
-
-      if (!capital || !lotInput || slIds.length === 0) {
-        resultRows.innerHTML = '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
-        summaryBar.style.display = 'none';
-        return;
-      }
-
-      let html = '';
-      let hasAny = false;
-
-      slIds.forEach((id, i) => {
-        const slVal = parseFloat(document.getElementById(id)?.value);
-        if (!slVal || slVal <= 0) {
-          html += `<div class="result-row">
-            <div class="result-row-num">${i+1}</div>
-            <div class="result-main">
-              <div class="result-value blue">—</div>
-              <div class="result-formula">ใส่ SL%</div>
-            </div>
-            <div class="result-sl-badge">SL —%</div>
-          </div>`;
-          return;
-        }
-        hasAny = true;
-        // Risk Amount = Lot × Capital × SL%
-        const riskAmt = lotInput * capital * (slVal / 100);
-        const riskPctCalc = (riskAmt / capital) * 100;
-        const formula = `${fmt(lotInput)} lot × ${fmt(capital)} × ${slVal}%`;
-
-        html += `<div class="result-row">
-          <div class="result-row-num">${i+1}</div>
-          <div class="result-main">
-            <div class="result-value blue">${fmt(riskAmt)} <span style="font-size:11px;color:var(--text3)">${riskPctCalc.toFixed(2)}%</span></div>
-            <div class="result-formula">${formula}</div>
-          </div>
-          <div class="result-sl-badge">SL ${slVal}%</div>
-        </div>`;
-      });
-
-      resultRows.innerHTML = html || '<div class="no-result">กรอกข้อมูลด้านบนเพื่อคำนวณ</div>';
-
-      if (hasAny) {
-        summaryBar.style.display = 'flex';
-        document.getElementById('sumCapital').textContent  = fmt(capital);
-        document.getElementById('sumRisk').textContent     = (riskPct || '—') + (riskPct ? '%' : '');
-        document.getElementById('sumRiskAmt').textContent  = fmt(lotInput) + ' lot';
-      } else {
-        summaryBar.style.display = 'none';
-      }
-    }
-  }
-
-  // Add first row on load
-  addRow();
+}
+addRow();
 </script>
 </body>
 </html>
